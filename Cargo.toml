@@ -1,0 +1,15 @@
+[package]
+name = "text_editor_3"
+version = "0.0.1"
+edition = "2021"
+description = "basic text editor program"
+license = "The 3-Clause BSD License"
+authors = ["Salmaan Saeed"]
+
+[dependencies]
+gtk = { version = "0.7.3", package="gtk4" }
+gdk = { version = "0.7.3", package="gdk4" }
+glib-macros = "0.18.3"
+gio = "0.18.3"
+gdk-pixbuf = "0.18.3"
+

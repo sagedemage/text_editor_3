@@ -1,0 +1,8 @@
+/target
+*.kra
+*.xcf
+*.kra~
+*.png~
+*.xcf~
+.markdown-preview.html
+images/*.png

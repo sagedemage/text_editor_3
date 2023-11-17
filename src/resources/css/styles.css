@@ -1,0 +1,30 @@
+button {
+	/* Put this, for the background color to be visible */
+    background-image: none;
+	font-size: 25px;
+}
+
+entry {
+	font-size: 25px;
+	padding-bottom: 20px;
+	padding-top: 10px;
+}
+
+button#clear-button {
+	background-color: #A00000;
+}
+
+button#equals-button {
+	background-color: #0059FF;
+}
+
+button#number_buttons {
+	background-color: #4C4C4C;
+}
+
+button#number_buttons, button#clear-button, 
+button#equals-button, button#period-button,
+button#negative-button, button#operator_buttons {
+	min-height: 36px;
+    min-width: 32px;
+}

@@ -1,0 +1,18 @@
+<interface>
+	<menu id="menu">
+		<section>
+			<item>
+				<attribute name="label">Open</attribute>
+				<attribute name="action">app.open</attribute>
+			</item>
+			<item>
+				<attribute name="label">Save</attribute>
+				<attribute name="action">app.save</attribute>
+			</item>
+			<item>
+				<attribute name="label">About</attribute>
+				<attribute name="action">app.about</attribute>
+			</item>
+		</section>
+	</menu>
+</interface>
