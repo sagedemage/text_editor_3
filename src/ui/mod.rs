@@ -98,7 +98,8 @@ pub fn build_ui(application: &Application) {
 
     open_action.connect_activate(clone!(@strong window, @strong text_view =>
         move |_, _| {
-            let file_chooser = FileChooserDialog::new(Some("Open File"), Some(&window), FileChooserAction::Open, &[("Open", ResponseType::Ok), ("Cancel", ResponseType::Cancel)]);
+            let buttons = [("Open", ResponseType::Ok), ("Cancel", ResponseType::Cancel)];
+            let file_chooser = FileChooserDialog::new(Some("Open File"), Some(&window), FileChooserAction::Open, &buttons);
 
             let text_view_temp = text_view.clone();
         
@@ -131,8 +132,9 @@ pub fn build_ui(application: &Application) {
     ));
 
     save_action.connect_activate(clone!(@strong window, @strong text_view => 
-        move |_, _| {    
-            let file_chooser = FileChooserDialog::new(Some("Save File"), Some(&window), FileChooserAction::Save, &[("Save", ResponseType::Ok), ("Cancel", ResponseType::Cancel)]);
+        move |_, _| {
+            let buttons = [("Save", ResponseType::Ok), ("Cancel", ResponseType::Cancel)]; 
+            let file_chooser = FileChooserDialog::new(Some("Save File"), Some(&window), FileChooserAction::Save, &buttons);
 
             let text_view_temp = text_view.clone();
 
