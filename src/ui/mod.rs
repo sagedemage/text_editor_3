@@ -1,13 +1,19 @@
 /* User Interface */
 
-use std::path::Path;
 use std::option::Option;
+use std::path::Path;
+use std::fs::File;
+use std::io::BufReader;
+use std::io::Read;
 
-use gtk::{Application, ApplicationWindow, Builder, PopoverMenu, Stack, 
-    HeaderBar, AboutDialog, MenuButton, Picture, TextView};
-use gtk::prelude::*;
-use gio::{Menu, SimpleAction};
+use gtk::{
+    AboutDialog, Application, ApplicationWindow, Builder, FileChooserDialog, FileChooserAction, HeaderBar, MenuButton,
+    Picture, PopoverMenu, Stack, TextView, ResponseType
+};
+
 use gdk_pixbuf::Pixbuf;
+use gio::{Menu, SimpleAction};
+use gtk::prelude::*;
 
 use glib_macros::clone;
 
@@ -67,33 +73,56 @@ pub fn build_ui(application: &Application) {
 
     // Create stack
     let stack = Stack::new();
-   
+
     // Create entry
     let text_view = TextView::new();
 
     /* Connect callbacks */
     about_action.connect_activate(clone!(@strong window =>
-        move |_, _| {
-            // create about dialog here
-            // About Dialog 
-            let about_dialog = AboutDialog::builder()
-                .transient_for(&window) // the temporary parent of the window 
-                .modal(true) // freezes the rest of the app from user input
-                .logo(&app_logo.paintable().unwrap())
-                .version(APP_VERSION)
-                .comments(DESCRIPTION)
-                .copyright(format!("{}{}", COPYRIGHT_FORMAT, AUTHORS).as_str())
-                .authors(vec![String::from(AUTHORS)])
-                .license(LICENSE)
-                .build();
-            
-            // Show the about dialog
-            about_dialog.present();
-        }));
+    move |_, _| {
+        // create about dialog here
+        // About Dialog
+        let about_dialog = AboutDialog::builder()
+            .transient_for(&window) // the temporary parent of the window
+            .modal(true) // freezes the rest of the app from user input
+            .logo(&app_logo.paintable().unwrap())
+            .version(APP_VERSION)
+            .comments(DESCRIPTION)
+            .copyright(format!("{}{}", COPYRIGHT_FORMAT, AUTHORS).as_str())
+            .authors(vec![String::from(AUTHORS)])
+            .license(LICENSE)
+            .build();
 
-    open_action.connect_activate(move |_, _| {
-        println!("Open file");
-    });
+        // Show the about dialog
+        about_dialog.present();
+    }));
+
+    open_action.connect_activate(clone!(@strong window =>
+        move |_, _| {
+        
+        let file_chooser = FileChooserDialog::new(Some("Open File"), Some(&window), FileChooserAction::Open, &[("Open", ResponseType::Ok), ("Cancel", ResponseType::Cancel)]);
+
+        file_chooser.connect_response(move |d: &FileChooserDialog, response: ResponseType| {
+            if response == ResponseType::Ok {
+                let file = d.file().expect("Couldn't get file");
+
+                let filename = file.path().expect("Couldn't get file path");
+                let file = File::open(filename.clone()).expect("Couldn't open file");
+
+                let mut reader = BufReader::new(file);
+                let mut contents = String::new();
+                let _ = reader.read_to_string(&mut contents);
+
+                println!("{}", filename.into_os_string().into_string().unwrap());
+                println!("");
+                println!("{}", contents);
+            }
+
+            d.close();
+        });
+
+        file_chooser.show();
+    }));
 
     save_action.connect_activate(move |_, _| {
         println!("Save file");
@@ -122,4 +151,3 @@ pub fn build_ui(application: &Application) {
     // Present the window
     window.present();
 }
-
