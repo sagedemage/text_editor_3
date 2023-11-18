@@ -80,22 +80,21 @@ pub fn build_ui(application: &Application) {
 
     /* Connect callbacks */
     about_action.connect_activate(clone!(@strong window =>
-    move |_, _| {
-        // create about dialog here
-        // About Dialog
-        let about_dialog = AboutDialog::builder()
-            .transient_for(&window) // the temporary parent of the window
-            .modal(true) // freezes the rest of the app from user input
-            .logo(&app_logo.paintable().unwrap())
-            .version(APP_VERSION)
-            .comments(DESCRIPTION)
-            .copyright(format!("{}{}", COPYRIGHT_FORMAT, AUTHORS).as_str())
-            .authors(vec![String::from(AUTHORS)])
-            .license(LICENSE)
-            .build();
+        move |_, _| {
+            // About Dialog
+            let about_dialog = AboutDialog::builder()
+                .transient_for(&window) // the temporary parent of the window
+                .modal(true) // freezes the rest of the app from user input
+                .logo(&app_logo.paintable().unwrap())
+                .version(APP_VERSION)
+                .comments(DESCRIPTION)
+                .copyright(format!("{}{}", COPYRIGHT_FORMAT, AUTHORS).as_str())
+                .authors(vec![String::from(AUTHORS)])
+                .license(LICENSE)
+                .build();
 
-        // Show the about dialog
-        about_dialog.present();
+            // Show the about dialog
+            about_dialog.present();
     }));
 
     open_action.connect_activate(clone!(@strong window, @strong text_view =>
