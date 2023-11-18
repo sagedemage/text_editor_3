@@ -4,12 +4,6 @@ button {
 	font-size: 25px;
 }
 
-entry {
-	font-size: 25px;
-	padding-bottom: 20px;
-	padding-top: 10px;
-}
-
 button#clear-button {
 	background-color: #A00000;
 }
