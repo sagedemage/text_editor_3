@@ -76,8 +76,6 @@ pub fn build_ui(application: &Application) {
     // Create text view
     let text_view = TextView::new();
 
-    
-
     /* Connect callbacks */
     about_action.connect_activate(clone!(@strong window =>
         move |_, _| {
