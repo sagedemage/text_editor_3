@@ -124,9 +124,33 @@ pub fn build_ui(application: &Application) {
         file_chooser.show();
     }));
 
-    save_action.connect_activate(move |_, _| {
+    save_action.connect_activate(clone!(@strong window => 
+        move |_, _| {
+        let file_chooser = FileChooserDialog::new(Some("Save File"), Some(&window), FileChooserAction::Save, &[("Save", ResponseType::Ok), ("Cancel", ResponseType::Cancel)]);
+
+        file_chooser.connect_response(move |d: &FileChooserDialog, response: ResponseType| {
+            if response == ResponseType::Ok {
+                let file = d.file().expect("Couldn't get file");
+
+                let filename = file.path().expect("Couldn't get file path");
+                //let file = File::open(filename.clone()).expect("Couldn't open file");
+
+                /*
+                let mut reader = BufReader::new(file);
+                let mut contents = String::new();
+                let _ = reader.read_to_string(&mut contents);
+                */
+
+                println!("{}", filename.into_os_string().into_string().unwrap());
+                //println!("{}", contents);
+            }
+
+            d.close();
+        });
+
+        file_chooser.show();
         println!("Save file");
-    });
+    }));
 
     // Set popover for menu button
     menu_button.set_popover(Some(&popover_menu));
