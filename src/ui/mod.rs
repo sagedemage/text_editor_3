@@ -93,69 +93,73 @@ pub fn build_ui(application: &Application) {
 
             // Show the about dialog
             about_dialog.present();
-    }));
+        }
+    ));
 
     open_action.connect_activate(clone!(@strong window, @strong text_view =>
         move |_, _| {
+            let file_chooser = FileChooserDialog::new(Some("Open File"), Some(&window), FileChooserAction::Open, &[("Open", ResponseType::Ok), ("Cancel", ResponseType::Cancel)]);
+
+            let text_view_temp = text_view.clone();
         
-        let file_chooser = FileChooserDialog::new(Some("Open File"), Some(&window), FileChooserAction::Open, &[("Open", ResponseType::Ok), ("Cancel", ResponseType::Cancel)]);
+            file_chooser.connect_response(
+                move |d: &FileChooserDialog, response: ResponseType| {
+                    if response == ResponseType::Ok {
+                        let file = d.file().expect("Couldn't get file");
 
-        let text_view_temp = text_view.clone();
-        
-        file_chooser.connect_response(move |d: &FileChooserDialog, response: ResponseType| {
-            if response == ResponseType::Ok {
-                let file = d.file().expect("Couldn't get file");
+                        let filename = file.path().expect("Couldn't get file path");
 
-                let filename = file.path().expect("Couldn't get file path");
+                        // Open File
+                        let text_content = FileStream::open(filename.clone());
 
-                // Open File
-                let text_content = FileStream::open(filename.clone());
+                        // Change content of text view
+                        let mut content_buffer = TextBuffer::new(None);
+                        content_buffer.write_str(text_content.as_str()).unwrap();
+                        text_view_temp.set_buffer(Some(&content_buffer));
 
-                // Change content of text view
-                let mut content_buffer = TextBuffer::new(None);
-                content_buffer.write_str(text_content.as_str()).unwrap();
-                text_view_temp.set_buffer(Some(&content_buffer));
+                        println!("{}", filename.into_os_string().into_string().unwrap());
+                        println!("");
+                        println!("{}", text_content);
+                    }
 
-                println!("{}", filename.into_os_string().into_string().unwrap());
-                println!("");
-                println!("{}", text_content);
-            }
+                    d.close();
+                }
+            );
 
-            d.close();
-        });
-
-        file_chooser.show();
-    }));
+            file_chooser.show();
+        }
+    ));
 
     save_action.connect_activate(clone!(@strong window, @strong text_view => 
-        move |_, _| {
-        let file_chooser = FileChooserDialog::new(Some("Save File"), Some(&window), FileChooserAction::Save, &[("Save", ResponseType::Ok), ("Cancel", ResponseType::Cancel)]);
+        move |_, _| {    
+            let file_chooser = FileChooserDialog::new(Some("Save File"), Some(&window), FileChooserAction::Save, &[("Save", ResponseType::Ok), ("Cancel", ResponseType::Cancel)]);
 
-        let text_view_temp = text_view.clone();
+            let text_view_temp = text_view.clone();
 
-        file_chooser.connect_response(move |d: &FileChooserDialog, response: ResponseType| {
-            if response == ResponseType::Ok {
-                let file = d.file().expect("Couldn't get file");
+            file_chooser.connect_response(move |d: &FileChooserDialog, response: ResponseType| {
+                if response == ResponseType::Ok {
+                    let file = d.file().expect("Couldn't get file");
 
-                let filename = file.path().expect("Couldn't get file path");
+                    let filename = file.path().expect("Couldn't get file path");
                 
-                // Get text content from text view
-                let text_buffer = text_view_temp.buffer();
-                let (start, end) = text_buffer.bounds(); 
-                let text_content = text_buffer.text(&start, &end, false);
+                    // Get text content from text view
+                    let text_buffer = text_view_temp.buffer();
+                    let (start, end) = text_buffer.bounds(); 
+                    let text_content = text_buffer.text(&start, &end, false);
 
-                // Save file
-                FileStream::save(filename.clone(), text_content.as_str());
+                    // Save file
+                    FileStream::save(filename.clone(), text_content.as_str());
 
-                println!("{}", filename.into_os_string().into_string().unwrap());
-            }
+                    println!("{}", filename.into_os_string().into_string().unwrap());
+                }
 
-            d.close();
-        });
+                d.close();
+            });
 
-        file_chooser.show();
-        println!("Save file");
-    }));
+            file_chooser.show();
+            println!("Save file");
+        }
+    ));
 
     // Set popover for menu button
     menu_button.set_popover(Some(&popover_menu));
