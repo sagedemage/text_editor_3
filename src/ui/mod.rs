@@ -135,7 +135,7 @@ pub fn build_ui(application: &Application) {
 
                 let filename = file.path().expect("Couldn't get file path");
                 let mut file = File::create(filename.clone()).expect("Couldn't open file");
-                file.write_all(b"Hello world!").unwrap();
+                file.write_all(b"Hello world!").expect("Could not save file");
 
                 /*
                 let mut reader = BufReader::new(file);
