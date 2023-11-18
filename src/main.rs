@@ -5,6 +5,7 @@ use gtk::prelude::*;
 
 mod ui;
 mod css;
+mod file_stream;
 
 const APP_ID: &str = "org.gtk_rs.GObjectSubclassing1";
 const CSS_FILE_PATH: &str = "src/resources/css/styles.css";

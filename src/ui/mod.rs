@@ -1,20 +1,18 @@
 /* User Interface */
 
-use std::io::Write;
+use std::fmt::Write;
 use std::option::Option;
 use std::path::Path;
-use std::fs::File;
-use std::io::BufReader;
-use std::io::Read;
+use crate::file_stream::FileStream;
+use gtk::prelude::*;
 
 use gtk::{
     AboutDialog, Application, ApplicationWindow, Builder, FileChooserDialog, FileChooserAction, HeaderBar, MenuButton,
-    Picture, PopoverMenu, Stack, TextView, ResponseType
+    Picture, PopoverMenu, Stack, TextView, ResponseType, TextBuffer
 };
 
 use gdk_pixbuf::Pixbuf;
 use gio::{Menu, SimpleAction};
-use gtk::prelude::*;
 
 use glib_macros::clone;
 
@@ -78,6 +76,8 @@ pub fn build_ui(application: &Application) {
     // Create entry
     let text_view = TextView::new();
 
+    
+
     /* Connect callbacks */
     about_action.connect_activate(clone!(@strong window =>
     move |_, _| {
@@ -98,25 +98,30 @@ pub fn build_ui(application: &Application) {
         about_dialog.present();
     }));
 
-    open_action.connect_activate(clone!(@strong window =>
+    open_action.connect_activate(clone!(@strong window, @strong text_view =>
         move |_, _| {
         
         let file_chooser = FileChooserDialog::new(Some("Open File"), Some(&window), FileChooserAction::Open, &[("Open", ResponseType::Ok), ("Cancel", ResponseType::Cancel)]);
 
+        let text_view_temp = text_view.clone();
+        
         file_chooser.connect_response(move |d: &FileChooserDialog, response: ResponseType| {
             if response == ResponseType::Ok {
                 let file = d.file().expect("Couldn't get file");
 
                 let filename = file.path().expect("Couldn't get file path");
-                let file = File::open(filename.clone()).expect("Couldn't open file");
 
-                let mut reader = BufReader::new(file);
-                let mut contents = String::new();
-                let _ = reader.read_to_string(&mut contents);
+                // Open File
+                let text_content = FileStream::open(filename.clone());
+
+                // Change content of text view
+                let mut content_buffer = TextBuffer::new(None);
+                content_buffer.write_str(text_content.as_str()).unwrap();
+                text_view_temp.set_buffer(Some(&content_buffer));
 
                 println!("{}", filename.into_os_string().into_string().unwrap());
                 println!("");
-                println!("{}", contents);
+                println!("{}", text_content);
             }
 
             d.close();
@@ -125,26 +130,27 @@ pub fn build_ui(application: &Application) {
         file_chooser.show();
     }));
 
-    save_action.connect_activate(clone!(@strong window => 
+    save_action.connect_activate(clone!(@strong window, @strong text_view => 
         move |_, _| {
         let file_chooser = FileChooserDialog::new(Some("Save File"), Some(&window), FileChooserAction::Save, &[("Save", ResponseType::Ok), ("Cancel", ResponseType::Cancel)]);
+
+        let text_view_temp = text_view.clone();
 
         file_chooser.connect_response(move |d: &FileChooserDialog, response: ResponseType| {
             if response == ResponseType::Ok {
                 let file = d.file().expect("Couldn't get file");
 
                 let filename = file.path().expect("Couldn't get file path");
-                let mut file = File::create(filename.clone()).expect("Couldn't open file");
-                file.write_all(b"Hello world!").expect("Could not save file");
+                
+                // Get text content from text view
+                let text_buffer = text_view_temp.buffer();
+                let (start, end) = text_buffer.bounds(); 
+                let text_content = text_buffer.text(&start, &end, false);
 
-                /*
-                let mut reader = BufReader::new(file);
-                let mut contents = String::new();
-                let _ = reader.read_to_string(&mut contents);
-                */
+                // Save file
+                FileStream::save(filename.clone(), text_content.as_str());
 
                 println!("{}", filename.into_os_string().into_string().unwrap());
-                //println!("{}", contents);
             }
 
             d.close();
