@@ -73,7 +73,7 @@ pub fn build_ui(application: &Application) {
     // Create stack
     let stack = Stack::new();
 
-    // Create entry
+    // Create text view
     let text_view = TextView::new();
 
     
