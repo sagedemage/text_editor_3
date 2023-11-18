@@ -1,5 +1,6 @@
 /* User Interface */
 
+use std::io::Write;
 use std::option::Option;
 use std::path::Path;
 use std::fs::File;
@@ -133,7 +134,8 @@ pub fn build_ui(application: &Application) {
                 let file = d.file().expect("Couldn't get file");
 
                 let filename = file.path().expect("Couldn't get file path");
-                //let file = File::open(filename.clone()).expect("Couldn't open file");
+                let mut file = File::create(filename.clone()).expect("Couldn't open file");
+                file.write_all(b"Hello world!").unwrap();
 
                 /*
                 let mut reader = BufReader::new(file);
