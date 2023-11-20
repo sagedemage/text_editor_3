@@ -29,7 +29,7 @@ pub fn build_ui(application: &Application) {
     // Create Window
     let window = ApplicationWindow::builder()
         .application(application)
-        .title("Text Editor 3")
+        .title("Text Editor 3 - Untitled")
         .default_width(500)
         .default_height(500)
         .build();
@@ -101,10 +101,10 @@ pub fn build_ui(application: &Application) {
             let buttons = [("Open", ResponseType::Ok), ("Cancel", ResponseType::Cancel)];
             let file_chooser = FileChooserDialog::new(Some("Open File"), Some(&window), FileChooserAction::Open, &buttons);
 
+            let window_temp = window.clone();
             let text_view_temp = text_view.clone();
         
-            file_chooser.connect_response(
-                move |d: &FileChooserDialog, response: ResponseType| {
+            file_chooser.connect_response(move |d: &FileChooserDialog, response: ResponseType| {
                     if response == ResponseType::Ok {
                         let file = d.file().expect("Couldn't get file");
 
@@ -117,6 +117,12 @@ pub fn build_ui(application: &Application) {
                         let mut content_buffer = TextBuffer::new(None);
                         content_buffer.write_str(text_content.as_str()).unwrap();
                         text_view_temp.set_buffer(Some(&content_buffer));
+
+                        /* Change Window Title */
+                        let title_with_file_path = String::from("Text Editor 3 - ") + filename.to_str().unwrap();
+
+                        // Change window title
+                        window_temp.set_title(Some(title_with_file_path.as_str()));
 
                         println!("{}", filename.into_os_string().into_string().unwrap());
                         println!("");
@@ -136,6 +142,7 @@ pub fn build_ui(application: &Application) {
             let buttons = [("Save", ResponseType::Ok), ("Cancel", ResponseType::Cancel)]; 
             let file_chooser = FileChooserDialog::new(Some("Save File"), Some(&window), FileChooserAction::Save, &buttons);
 
+            let window_temp = window.clone();
             let text_view_temp = text_view.clone();
 
             file_chooser.connect_response(move |d: &FileChooserDialog, response: ResponseType| {
@@ -151,6 +158,12 @@ pub fn build_ui(application: &Application) {
 
                     // Save file
                     FileStream::save(filename.clone(), text_content.as_str());
+
+                    /* Change Window Title */
+                    let title_with_file_path = String::from("Text Editor 3 - ") + filename.to_str().unwrap();
+
+                    // Change window title
+                    window_temp.set_title(Some(title_with_file_path.as_str()));
 
                     println!("{}", filename.into_os_string().into_string().unwrap());
                 }
