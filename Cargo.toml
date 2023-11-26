@@ -1,6 +1,6 @@
 [package]
 name = "text_editor_3"
-version = "0.0.1"
+version = "0.2.0"
 edition = "2021"
 description = "basic text editor program"
 license = "The 3-Clause BSD License"
