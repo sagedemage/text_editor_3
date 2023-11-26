@@ -3,6 +3,9 @@
 use std::fmt::Write;
 use std::option::Option;
 use std::path::{Path, PathBuf};
+use std::rc::Rc;
+use std::cell::RefCell;
+
 use crate::file_stream::FileStream;
 use gtk::prelude::*;
 
@@ -15,9 +18,6 @@ use gdk_pixbuf::Pixbuf;
 use gio::{Menu, SimpleAction};
 
 use glib_macros::clone;
-
-use std::rc::Rc;
-use std::cell::RefCell;
 
 const APP_VERSION: &str = env!("CARGO_PKG_VERSION"); // get package version from Cargo
 const LICENSE: &str = env!("CARGO_PKG_LICENSE"); // get license of the project
