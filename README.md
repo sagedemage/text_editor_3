@@ -41,5 +41,5 @@ cargo install --path .
 
 Run the executable
 ```
-calculator
+text_editor_3
 ```
