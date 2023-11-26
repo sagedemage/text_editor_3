@@ -188,7 +188,6 @@ pub fn build_ui(application: &Application) {
             if *file_path.borrow() == "" {
                 file_chooser.show();
             }
-            
             else {
                 let text_view_temp = text_view.clone();
                 
