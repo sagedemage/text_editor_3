@@ -47,7 +47,7 @@ pub fn build_ui(application: &Application) {
     let image_logo_path = Path::new(LOGO_PATH);
 
     // Create pixbuf from file path of the app logo image
-    let image_logo_pixbuf = Pixbuf::from_file(&image_logo_path);
+    let image_logo_pixbuf = Pixbuf::from_file(image_logo_path);
 
     // Get the Pixbuf value of file_pixbuf if the file exists
     let image_logo_pixbuf = image_logo_pixbuf.expect("File Not Found: app logo image not found!");
@@ -68,7 +68,7 @@ pub fn build_ui(application: &Application) {
     let save_action = SimpleAction::new("save", None);
 
     // Get Menu
-    let menu = menu_object.unwrap();
+    let menu = menu_object.expect("Could not get the menu");
 
     // Create Popover Menu from menu
     let popover_menu = PopoverMenu::from_model(Some(&menu));
@@ -79,7 +79,7 @@ pub fn build_ui(application: &Application) {
     // Create text view
     let text_view = TextView::new();
 
-    let file_path = Rc::new(RefCell::new(String::from("")));
+    let file_path = Rc::new(RefCell::new(String::new()));
 
     /* Connect callbacks */
     about_action.connect_activate(clone!(@strong window =>
@@ -88,10 +88,10 @@ pub fn build_ui(application: &Application) {
             let about_dialog = AboutDialog::builder()
                 .transient_for(&window) // the temporary parent of the window
                 .modal(true) // freezes the rest of the app from user input
-                .logo(&app_logo.paintable().unwrap())
+                .logo(&app_logo.paintable().expect("Could not get the paintable app logo"))
                 .version(APP_VERSION)
                 .comments(DESCRIPTION)
-                .copyright(format!("{}{}", COPYRIGHT_FORMAT, AUTHORS).as_str())
+                .copyright(format!("{COPYRIGHT_FORMAT}{AUTHORS}").as_str())
                 .authors(vec![String::from(AUTHORS)])
                 .license(LICENSE)
                 .build();
@@ -121,21 +121,20 @@ pub fn build_ui(application: &Application) {
 
                         // Change content of text view
                         let mut content_buffer = TextBuffer::new(None);
-                        content_buffer.write_str(text_content.as_str()).unwrap();
+                        content_buffer.write_str(text_content.as_str()).expect("Could not write to content buffer");
                         text_view_temp.set_buffer(Some(&content_buffer));
 
                         /* Change Window Title */
-                        let title_with_file_path = String::from("Text Editor 3 - ") + filename.to_str().unwrap();
+                        let title_with_file_path = String::from("Text Editor 3 - ") + filename.to_str().expect("Could not get the string of file path");
 
                         // Change window title
                         window_temp.set_title(Some(title_with_file_path.as_str()));
 
                         // Set file path
-                        file_path.replace(String::from(filename.to_str().unwrap()));
+                        file_path.replace(String::from(filename.to_str().expect("Could not get the string of file path")));
 
-                        println!("{}", filename.into_os_string().into_string().unwrap());
-                        println!("");
-                        println!("{}", text_content);
+                        println!("{}\n", filename.into_os_string().into_string().expect("Could not get the string of file path"));
+                        println!("{text_content}");
                     }
 
                     d.close();
@@ -170,22 +169,22 @@ pub fn build_ui(application: &Application) {
                         FileStream::save(filename.clone(), text_content.as_str());
 
                         /* Change Window Title */
-                        let title_with_file_path = String::from("Text Editor 3 - ") + filename.to_str().unwrap();
+                        let title_with_file_path = String::from("Text Editor 3 - ") + filename.to_str().expect("Could not get the string of file path");
 
                         // Change window title
-                        window_temp.set_title(Some(title_with_file_path.clone().as_str()));
+                        window_temp.set_title(Some(title_with_file_path.as_str()));
 
                         // Set file path
-                        file_path.replace(String::from(filename.to_str().unwrap()));
+                        file_path.replace(String::from(filename.to_str().expect("Could not get the string of file path")));
 
-                        println!("{}", filename.into_os_string().into_string().unwrap());
+                        println!("{}", filename.into_os_string().into_string().expect("Could not get the string of file path"));
                     }
 
                     d.close();
                 }
             ));
 
-            if *file_path.borrow() == "" {
+            if file_path.borrow().is_empty() {
                 file_chooser.show();
             }
             else {
