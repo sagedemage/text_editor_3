@@ -6,7 +6,7 @@ description = "basic text editor program"
 license = "The 3-Clause BSD License"
 authors = ["Salmaan Saeed"]
 keywords = ["text editor"]
-categories = ["word"]
+categories = ["text editor"]
 repository = "https://github.com/sagedemage/text_editor_3"
 
 [dependencies]
