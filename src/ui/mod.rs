@@ -2,7 +2,7 @@
 
 use std::fmt::Write;
 use std::option::Option;
-use std::path::Path;
+use std::path::{Path, PathBuf};
 use crate::file_stream::FileStream;
 use gtk::prelude::*;
 
@@ -15,6 +15,9 @@ use gdk_pixbuf::Pixbuf;
 use gio::{Menu, SimpleAction};
 
 use glib_macros::clone;
+
+use std::rc::Rc;
+use std::cell::RefCell;
 
 const APP_VERSION: &str = env!("CARGO_PKG_VERSION"); // get package version from Cargo
 const LICENSE: &str = env!("CARGO_PKG_LICENSE"); // get license of the project
@@ -76,6 +79,8 @@ pub fn build_ui(application: &Application) {
     // Create text view
     let text_view = TextView::new();
 
+    let file_path = Rc::new(RefCell::new(String::from("")));
+
     /* Connect callbacks */
     about_action.connect_activate(clone!(@strong window =>
         move |_, _| {
@@ -96,7 +101,7 @@ pub fn build_ui(application: &Application) {
         }
     ));
 
-    open_action.connect_activate(clone!(@strong window, @strong text_view =>
+    open_action.connect_activate(clone!(@strong window, @strong text_view, @strong file_path =>
         move |_, _| {
             let buttons = [("Open", ResponseType::Ok), ("Cancel", ResponseType::Cancel)];
             let file_chooser = FileChooserDialog::new(Some("Open File"), Some(&window), FileChooserAction::Open, &buttons);
@@ -104,7 +109,8 @@ pub fn build_ui(application: &Application) {
             let window_temp = window.clone();
             let text_view_temp = text_view.clone();
         
-            file_chooser.connect_response(move |d: &FileChooserDialog, response: ResponseType| {
+            file_chooser.connect_response(clone!(@strong file_path =>
+                move |d: &FileChooserDialog, response: ResponseType| {
                     if response == ResponseType::Ok {
                         let file = d.file().expect("Couldn't get file");
 
@@ -124,6 +130,9 @@ pub fn build_ui(application: &Application) {
                         // Change window title
                         window_temp.set_title(Some(title_with_file_path.as_str()));
 
+                        // Set file path
+                        file_path.replace(String::from(filename.to_str().unwrap()));
+
                         println!("{}", filename.into_os_string().into_string().unwrap());
                         println!("");
                         println!("{}", text_content);
@@ -131,13 +140,13 @@ pub fn build_ui(application: &Application) {
 
                     d.close();
                 }
-            );
+            ));
 
             file_chooser.show();
         }
     ));
 
-    save_action.connect_activate(clone!(@strong window, @strong text_view => 
+    save_action.connect_activate(clone!(@strong window, @strong text_view, @strong file_path => 
         move |_, _| {
             let buttons = [("Save", ResponseType::Ok), ("Cancel", ResponseType::Cancel)]; 
             let file_chooser = FileChooserDialog::new(Some("Save File"), Some(&window), FileChooserAction::Save, &buttons);
@@ -145,33 +154,55 @@ pub fn build_ui(application: &Application) {
             let window_temp = window.clone();
             let text_view_temp = text_view.clone();
 
-            file_chooser.connect_response(move |d: &FileChooserDialog, response: ResponseType| {
-                if response == ResponseType::Ok {
-                    let file = d.file().expect("Couldn't get file");
+            file_chooser.connect_response(clone!(@strong file_path => 
+                move |d: &FileChooserDialog, response: ResponseType| {
+                    if response == ResponseType::Ok {
+                        let file = d.file().expect("Couldn't get file");
 
-                    let filename = file.path().expect("Couldn't get file path");
+                        let filename = file.path().expect("Couldn't get file path");
                 
-                    // Get text content from text view
-                    let text_buffer = text_view_temp.buffer();
-                    let (start, end) = text_buffer.bounds(); 
-                    let text_content = text_buffer.text(&start, &end, false);
+                        // Get text content from text view
+                        let text_buffer = text_view_temp.buffer();
+                        let (start, end) = text_buffer.bounds(); 
+                        let text_content = text_buffer.text(&start, &end, false);
 
-                    // Save file
-                    FileStream::save(filename.clone(), text_content.as_str());
+                        // Save file
+                        FileStream::save(filename.clone(), text_content.as_str());
 
-                    /* Change Window Title */
-                    let title_with_file_path = String::from("Text Editor 3 - ") + filename.to_str().unwrap();
+                        /* Change Window Title */
+                        let title_with_file_path = String::from("Text Editor 3 - ") + filename.to_str().unwrap();
 
-                    // Change window title
-                    window_temp.set_title(Some(title_with_file_path.as_str()));
+                        // Change window title
+                        window_temp.set_title(Some(title_with_file_path.clone().as_str()));
 
-                    println!("{}", filename.into_os_string().into_string().unwrap());
+                        // Set file path
+                        file_path.replace(String::from(filename.to_str().unwrap()));
+
+                        println!("{}", filename.into_os_string().into_string().unwrap());
+                    }
+
+                    d.close();
                 }
+            ));
 
-                d.close();
-            });
+            if *file_path.borrow() == "" {
+                file_chooser.show();
+            }
+            
+            else {
+                let text_view_temp = text_view.clone();
+                
+                // Get text content from text view
+                let text_buffer = text_view_temp.buffer();
+                let (start, end) = text_buffer.bounds(); 
+                let text_content = text_buffer.text(&start, &end, false);
 
-            file_chooser.show();
+                let path_buffer = PathBuf::from(file_path.borrow().as_str());
+
+                // Save file
+                FileStream::save(path_buffer, text_content.as_str());                
+            }
+
             println!("Save file");
         }
     ));
