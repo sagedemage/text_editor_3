@@ -12,7 +12,7 @@ impl FileStream {
         let mut text_content = String::new();
         let _ = reader.read_to_string(&mut text_content);
 
-        return text_content;
+        text_content
     }
 
     pub fn save(filename: PathBuf, text_content: &str) {
