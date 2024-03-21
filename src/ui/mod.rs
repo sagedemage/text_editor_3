@@ -30,7 +30,7 @@ const MENU_UI_PATH: &str = "src/resources/ui/menu.ui";
 pub fn build_ui(application: &Application) {
     /* build ui of the application */
     let date = Date::new();
-    let copyright_format: String = format!("\u{00A9} {} ", date.year().to_string());
+    let copyright_format: String = format!("\u{00A9} {} ", date.year());
 
     // Create Window
     let window = ApplicationWindow::builder()
