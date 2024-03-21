@@ -1,8 +1,10 @@
+## Rust ##
 /target
+
+## Media files ##
 *.kra
 *.xcf
-*.kra~
-*.png~
-*.xcf~
-.markdown-preview.html
 images/*.png
+
+## Cache files ##
+*.*~
