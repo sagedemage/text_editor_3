@@ -7,6 +7,7 @@ use std::rc::Rc;
 use std::cell::RefCell;
 
 use crate::file_stream::FileStream;
+use crate::date::Date;
 use gtk::prelude::*;
 
 use gtk::{
@@ -23,12 +24,14 @@ const APP_VERSION: &str = env!("CARGO_PKG_VERSION"); // get package version from
 const LICENSE: &str = env!("CARGO_PKG_LICENSE"); // get license of the project
 const DESCRIPTION: &str = env!("CARGO_PKG_DESCRIPTION"); // get the description of the project
 const AUTHORS: &str = env!("CARGO_PKG_AUTHORS"); // get the authors of the project
-const COPYRIGHT_FORMAT: &str = "\u{00A9} 2023 "; // copyright format
 const LOGO_PATH: &str = "src/resources/images/logo.png"; // path to the logo
 const MENU_UI_PATH: &str = "src/resources/ui/menu.ui";
 
 pub fn build_ui(application: &Application) {
     /* build ui of the application */
+    let date = Date::new();
+    let copyright_format: String = format!("\u{00A9} {} ", date.year().to_string());
+
     // Create Window
     let window = ApplicationWindow::builder()
         .application(application)
@@ -93,7 +96,7 @@ pub fn build_ui(application: &Application) {
                 .logo(&app_logo.paintable().expect("Could not get the paintable app logo"))
                 .version(APP_VERSION)
                 .comments(DESCRIPTION)
-                .copyright(format!("{COPYRIGHT_FORMAT}{AUTHORS}").as_str())
+                .copyright(format!("{copyright_format}{AUTHORS}").as_str())
                 .authors(vec![String::from(AUTHORS)])
                 .license(LICENSE)
                 .build();
