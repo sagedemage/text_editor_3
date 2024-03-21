@@ -30,7 +30,7 @@ const MENU_UI_PATH: &str = "src/resources/ui/menu.ui";
 pub fn build_ui(application: &Application) {
     /* build ui of the application */
     let date = Date::new();
-    let copyright_format: String = format!("\u{00A9} {} ", date.year());
+    let copyright_format: String = format!("\u{00A9} {}", date.year());
 
     // Create Window
     let window = ApplicationWindow::builder()
@@ -96,7 +96,7 @@ pub fn build_ui(application: &Application) {
                 .logo(&app_logo.paintable().expect("Could not get the paintable app logo"))
                 .version(APP_VERSION)
                 .comments(DESCRIPTION)
-                .copyright(format!("{copyright_format}{AUTHORS}").as_str())
+                .copyright(format!("{copyright_format} {AUTHORS}").as_str())
                 .authors(vec![String::from(AUTHORS)])
                 .license(LICENSE)
                 .build();
