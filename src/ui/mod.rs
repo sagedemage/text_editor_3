@@ -11,7 +11,7 @@ use gtk::prelude::*;
 
 use gtk::{
     AboutDialog, Application, ApplicationWindow, Builder, FileChooserDialog, FileChooserAction, HeaderBar, MenuButton,
-    Picture, PopoverMenu, Stack, TextView, ResponseType, TextBuffer
+    Picture, PopoverMenu, Stack, TextView, ResponseType, TextBuffer, ScrolledWindow
 };
 
 use gdk_pixbuf::Pixbuf;
@@ -78,6 +78,8 @@ pub fn build_ui(application: &Application) {
 
     // Create text view
     let text_view = TextView::new();
+
+    let scrolled_window = ScrolledWindow::builder().child(&text_view).build();
 
     let file_path = Rc::new(RefCell::new(String::new()));
 
@@ -212,7 +214,7 @@ pub fn build_ui(application: &Application) {
     header_bar.pack_end(&menu_button);
 
     /* Attach widgets to the Grid */
-    stack.add_child(&text_view);
+    stack.add_child(&scrolled_window);
 
     // Add about action to the application
     application.add_action(&about_action);
